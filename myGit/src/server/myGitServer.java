@@ -12,6 +12,8 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import network.Comms;
+
 //Servidor myServer
 
 public class myGitServer {
@@ -23,7 +25,6 @@ public class myGitServer {
 		server.startServer();
 	}
 
-	@SuppressWarnings("resource")
 	public void startServer() {
 		ServerSocket sSoc = null;
 
@@ -55,10 +56,10 @@ public class myGitServer {
 	// Threads utilizadas para comunicacao com os clientes
 	class ServerThread extends Thread {
 
-		private Socket socket = null;
+		private Socket sock = null;
 
 		ServerThread(Socket inSoc) {
-			socket = inSoc;
+			sock = inSoc;
 			System.out.println("Thread do server para cada cliente");
 		}
 
@@ -66,38 +67,45 @@ public class myGitServer {
 			
 			try {
 				
-				ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream());
-				ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
+				ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
+				ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
 
 				String user = null;
 				String passwd = null;
 
-				try {
+				//READ THE USERNAME
+				user = in.readUTF();
+				
+				//CHECK IF IS REGISTERED
+				boolean isRegisteredForDEBUG = true;
+				
+				//SEND ANSWER FOR REGISTRY
+				out.writeBoolean(isRegisteredForDEBUG);
+				
+				//TODO WRITE AND READ CREDENTIALS FILE
+				boolean wantsToRegister = false;
+				
+				//Check if unregistered user wants to register
+				if(!isRegisteredForDEBUG){
 					
-					user = (String) inStream.readObject();
-					passwd = (String) inStream.readObject();
-					System.out.println("thread: depois de receber a password e o user");
+					//READ IF USER WANTS TO REGISTER
+					wantsToRegister = in.readBoolean();
 					
-				} catch (ClassNotFoundException e1) {
-					
-					e1.printStackTrace();
-					
+					//if user doesn't want to register, stop
+					if(!wantsToRegister){
+						Comms.closeAllComms(sock, out, in);
+					}
 				}
 
-				// TODO: refazer
-				// este codigo apenas exemplifica a comunicacao entre o cliente
-				// e o servidor
-				// nao faz qualquer tipo de autenticacao
-				if (user.length() != 0) {
-					System.out.println(user + passwd);
-				} else {
-					System.out.println("FAIL");
-				}
-
-				outStream.close();
-				inStream.close();
-
-				socket.close();
+				//RECEIVE THE PASSWORD
+				passwd = in.readUTF();
+				
+				//SEND IF PASSWORD IS VALID
+				//TODO WRITE AND READ CREDENTIALS FILE
+				boolean isValidPassword = true;
+				
+				out.writeBoolean(isValidPassword);
+				
 
 			} catch (IOException e) {
 				

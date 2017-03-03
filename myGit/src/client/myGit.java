@@ -92,7 +92,7 @@ public class myGit {
 						try {
 
 							// SEND USERNAME
-							out.writeUTF(username); // << OUTCOMING
+							out.writeUTF(username); // << OUTGOING
 
 							// Receive if username is registered
 							isRegistered = in.readBoolean(); 	// << 
@@ -114,7 +114,7 @@ public class myGit {
 
 								// SEND REGISTRY VEREDICT
 								out.writeBoolean(wantsToRegister); 	// <<
-																	// OUTCOMING
+																	// OUTGOING
 
 								if (wantsToRegister) {
 
@@ -131,7 +131,7 @@ public class myGit {
 							}
 
 							// SEND THE PASSWORD
-							out.writeUTF(password); // << OUTCOMING
+							out.writeUTF(password); // << OUTGOING
 
 							// RECEIVE IF IS VALID
 							boolean validPassword = in.readBoolean(); 	// <<
@@ -143,6 +143,7 @@ public class myGit {
 
 							if (validPassword) {
 								// TODO: MAIN PROGRAM
+								System.out.println("SUCESSO");
 							}
 
 						} catch (IOException e) {
